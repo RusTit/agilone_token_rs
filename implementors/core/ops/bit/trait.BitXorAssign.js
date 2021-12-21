@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["devise_core"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.57.0/core/ops/bit/trait.BitXorAssign.html\" title=\"trait core::ops::bit::BitXorAssign\">BitXorAssign</a>&lt;<a class=\"struct\" href=\"devise_core/struct.Support.html\" title=\"struct devise_core::Support\">Support</a>&gt; for <a class=\"struct\" href=\"devise_core/struct.Support.html\" title=\"struct devise_core::Support\">Support</a>","synthetic":false,"types":["devise_core::support::Support"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

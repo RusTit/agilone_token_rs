@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Form field validation routines."><meta name="keywords" content="rust, rustlang, rust-lang, validate"><title>rocket::form::validate - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rocket/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;logo-boxed.png' alt='logo'></div></a><h2 class="location">Module validate</h2><div class="sidebar-elems"><div class="block items"><ul><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="validate" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../../index.html">rocket</a>::<wbr><a href="../index.html">form</a>::<wbr><a class="mod" href="#">validate</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/rocket/form/validate.rs.html#1-829" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Form field validation routines.</p>
+<p>Each function in this module can be used as the target of the
+<code>field(validate)</code> field attribute of the <code>FromForm</code> derive.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rocket::form::FromForm</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromForm</span>)]</span>
+<span class="kw">struct</span> <span class="ident">MyForm</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">range</span>(<span class="number">2</span>..<span class="number">10</span>))]</span>
+    <span class="ident">id</span>: <span class="ident">usize</span>,
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">omits</span>(<span class="string">&quot;password&quot;</span>))]</span>
+    <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">str</span>,
+}</code></pre></div>
+<p>The <code>validate</code> parameter takes any expression that returns a
+<a href="../type.Result.html"><code>form::Result&lt;()&gt;</code></a>. If the expression is a function
+call, a reference to the field is inserted as the first parameter. Thus,
+functions calls to <code>validate</code> must take a reference to <em>some</em> type,
+typically a generic with some bounds, as their first argument.</p>
+<h3 id="custom-error-messages" class="section-header"><a href="#custom-error-messages">Custom Error Messages</a></h3>
+<p>To set a custom error messages, it is useful to chain results:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rocket::form</span>::{<span class="ident">Errors</span>, <span class="ident">Error</span>, <span class="ident">FromForm</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromForm</span>)]</span>
+<span class="kw">struct</span> <span class="ident">MyForm</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
+    <span class="comment">// By defining another function...</span>
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">omits</span>(<span class="string">&quot;password&quot;</span>).<span class="ident">map_err</span>(<span class="ident">pass_help</span>))]</span>
+    <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">str</span>,
+    <span class="comment">// or inline using the `msg` helper. `or_else` inverts the validator</span>
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">omits</span>(<span class="string">&quot;password&quot;</span>).<span class="ident">or_else</span>(<span class="macro">msg!</span>(<span class="string">&quot;please omit `password`&quot;</span>)))]</span>
+    <span class="ident">password2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">str</span>,
+    <span class="comment">// You can even refer to the field in the message...</span>
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">range</span>(<span class="number">1</span>..).<span class="ident">or_else</span>(<span class="macro">msg!</span>(<span class="string">&quot;`{}` &lt; 1&quot;</span>, <span class="self">self</span>.<span class="ident">n</span>)))]</span>
+    <span class="ident">n</span>: <span class="ident">isize</span>,
+    <span class="comment">// ..or other fields!</span>
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">range</span>(..<span class="self">self</span>.<span class="ident">n</span>).<span class="ident">or_else</span>(<span class="macro">msg!</span>(<span class="string">&quot;`{}` &gt; `{}`&quot;</span>, <span class="self">self</span>.<span class="ident">z</span>, <span class="self">self</span>.<span class="ident">n</span>)))]</span>
+    <span class="ident">z</span>: <span class="ident">isize</span>,
+}
+
+<span class="kw">fn</span> <span class="ident">pass_help</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">errors</span>: <span class="ident">Errors</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Errors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">Error::validation</span>(<span class="string">&quot;passwords can&#39;t contain the text \&quot;password\&quot;&quot;</span>).<span class="ident">into</span>()
+}</code></pre></div>
+<h3 id="custom-validation" class="section-header"><a href="#custom-validation">Custom Validation</a></h3>
+<p>Custom validation routines can be defined as regular functions. Consider a
+routine that tries to validate a credit card number:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">time</span>;
+
+<span class="kw">use</span> <span class="ident">rocket::form</span>::{<span class="self">self</span>, <span class="ident">FromForm</span>, <span class="ident">Error</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromForm</span>)]</span>
+<span class="kw">struct</span> <span class="ident">CreditCard</span> {
+    <span class="attribute">#[<span class="ident">field</span>(<span class="ident">validate</span> <span class="op">=</span> <span class="ident">luhn</span>(<span class="self">self</span>.<span class="ident">cvv</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">expiration</span>))]</span>
+    <span class="ident">number</span>: <span class="ident">u64</span>,
+    <span class="ident">cvv</span>: <span class="ident">u16</span>,
+    <span class="ident">expiration</span>: <span class="ident">time::Date</span>,
+}
+
+<span class="comment">// Implementation of Luhn validator.</span>
+<span class="kw">fn</span> <span class="ident">luhn</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span>(<span class="ident">number</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>, <span class="ident">cvv</span>: <span class="ident">u16</span>, <span class="ident">exp</span>: <span class="kw-2">&amp;</span><span class="ident">time::Date</span>) -&gt; <span class="ident">form::Result</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">valid</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Error::validation</span>(<span class="string">&quot;invalid credit card number&quot;</span>))<span class="question-mark">?</span>;
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+</div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use msg_7732754123972675279::___internal_msg as msg;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Contains.html" title="rocket::form::validate::Contains trait">Contains</a></div><div class="item-right docblock-short"><p>Types for values that contain items.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Len.html" title="rocket::form::validate::Len trait">Len</a></div><div class="item-right docblock-short"><p>Types for values that have a length.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.contains.html" title="rocket::form::validate::contains fn">contains</a></div><div class="item-right docblock-short"><p>Contains validator: succeeds when a value contains <code>item</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.dbg_contains.html" title="rocket::form::validate::dbg_contains fn">dbg_contains</a></div><div class="item-right docblock-short"><p>Debug contains validator: like <a href="fn.contains.html" title="contains()"><code>contains()</code></a> but mentions <code>item</code> in the
+error message.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.dbg_eq.html" title="rocket::form::validate::dbg_eq fn">dbg_eq</a></div><div class="item-right docblock-short"><p>Debug equality validator: like <a href="fn.eq.html" title="eq()"><code>eq()</code></a> but mentions <code>b</code> in the error
+message.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.dbg_omits.html" title="rocket::form::validate::dbg_omits fn">dbg_omits</a></div><div class="item-right docblock-short"><p>Debug omits validator: like <a href="fn.omits.html" title="omits()"><code>omits()</code></a> but mentions <code>item</code> in the error
+message.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.eq.html" title="rocket::form::validate::eq fn">eq</a></div><div class="item-right docblock-short"><p>Equality validator: succeeds exactly when <code>a</code> == <code>b</code>, using <a href="https://doc.rust-lang.org/1.57.0/core/cmp/trait.PartialEq.html" title="PartialEq"><code>PartialEq</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.ext.html" title="rocket::form::validate::ext fn">ext</a></div><div class="item-right docblock-short"><p>File type validator: succeeds when a <a href="../../fs/enum.TempFile.html" title="TempFile"><code>TempFile</code></a> has the Content-Type
+<code>content_type</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.len.html" title="rocket::form::validate::len fn">len</a></div><div class="item-right docblock-short"><p>Length validator: succeeds when the length of a value is within a <code>range</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.neq.html" title="rocket::form::validate::neq fn">neq</a></div><div class="item-right docblock-short"><p>Negative equality validator: succeeds exactly when <code>a</code> != <code>b</code>, using
+<a href="https://doc.rust-lang.org/1.57.0/core/cmp/trait.PartialEq.html" title="PartialEq"><code>PartialEq</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.omits.html" title="rocket::form::validate::omits fn">omits</a></div><div class="item-right docblock-short"><p>Omits validator: succeeds when a value <em>does not</em> contains <code>item</code>.
+error message.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.one_of.html" title="rocket::form::validate::one_of fn">one_of</a></div><div class="item-right docblock-short"><p>Contains one of validator: succeeds when a value contains at least one item
+in an <code>items</code> iterator.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.range.html" title="rocket::form::validate::range fn">range</a></div><div class="item-right docblock-short"><p>Integer range validator: succeeds when an integer value is within a range.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.with.html" title="rocket::form::validate::with fn">with</a></div><div class="item-right docblock-short"><p>With validator: succeeds when an arbitrary function or closure does.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rocket" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script>
+</body></html>

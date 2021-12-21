@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Key","A field name key composed of indices."],["Name","A field name composed of keys."],["NameBuf","A potentially owned [`Name`]."],["NameView","A sliding-prefix view into a [`Name`]."]]});

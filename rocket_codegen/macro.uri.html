@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Type-safe, encoding-safe route and non-route URI generation."><meta name="keywords" content="rust, rustlang, rust-lang, uri"><title>uri in rocket_codegen - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../rocket_codegen/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;logo-boxed.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="index.html">rocket_codegen</a></h2><div id="sidebar-vars" data-name="uri" data-ty="macro" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Macro <a href="index.html">rocket_codegen</a>::<wbr><a class="macro" href="#">uri</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/rocket_codegen/lib.rs.html#1381-1383" title="goto source code">[src]</a></span></h1><pre class="rust macro"><code>uri!() { /* proc-macro */ }</code></pre><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Type-safe, encoding-safe route and non-route URI generation.</p>
+<p>The <code>uri!</code> macro creates type-safe, URL-safe URIs given a route and concrete
+parameters for its URI or a URI string literal.</p>
+<h2 id="string-literal-parsing" class="section-header"><a href="#string-literal-parsing">String Literal Parsing</a></h2>
+<p>Given a string literal as input, <code>uri!</code> parses the string using
+[<code>Uri::parse_any()</code>] and emits a <code>'static</code>, <code>const</code> value whose type is one
+of <a href="../rocket/http/uri/struct.Asterisk.html"><code>Asterisk</code></a>, <a href="../rocket/http/uri/struct.Origin.html"><code>Origin</code></a>, <a href="../rocket/http/uri/struct.Authority.html"><code>Authority</code></a>, <a href="../rocket/http/uri/struct.Absolute.html"><code>Absolute</code></a>, or <a href="../rocket/http/uri/struct.Reference.html"><code>Reference</code></a>,
+reflecting the parsed value. If the type allows normalization, the value is
+normalized before being emitted. Parse errors are caught and emitted at
+compile-time.</p>
+<p>The grammar for this variant of <code>uri!</code> is:</p>
+<div class="example-wrap"><pre class="language-text"><code>uri := STRING
+
+STRING := an uncooked string literal, as defined by Rust (example: `&quot;/hi&quot;`)</code></pre></div>
+<p><code>STRING</code> is expected to be an undecoded URI of any variant.</p>
+<h3 id="examples" class="section-header"><a href="#examples">Examples</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rocket::http::uri::Absolute</span>;
+
+<span class="comment">// Values returned from `uri!` are `const` and `&#39;static`.</span>
+<span class="kw">const</span> <span class="ident">ROOT_CONST</span>: <span class="ident">Absolute</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs&quot;</span>);
+<span class="kw">static</span> <span class="ident">ROOT_STATIC</span>: <span class="ident">Absolute</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs?root&quot;</span>);
+
+<span class="comment">// Any variant can be parsed, but beware of ambiguities.</span>
+<span class="kw">let</span> <span class="ident">asterisk</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;*&quot;</span>);
+<span class="kw">let</span> <span class="ident">origin</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;/foo/bar/baz&quot;</span>);
+<span class="kw">let</span> <span class="ident">authority</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;rocket.rs:443&quot;</span>);
+<span class="kw">let</span> <span class="ident">absolute</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs:443&quot;</span>);
+<span class="kw">let</span> <span class="ident">reference</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;foo?bar#baz&quot;</span>);
+</code></pre></div>
+<h2 id="type-safe-route-uris" class="section-header"><a href="#type-safe-route-uris">Type-Safe Route URIs</a></h2>
+<p>A URI to a route name <code>foo</code> is generated using <code>uri!(foo(v1, v2, v3))</code> or
+<code>uri!(foo(a = v1, b = v2, c = v3))</code>, where <code>v1</code>, <code>v2</code>, <code>v3</code> are the values
+to fill in for route parameters named <code>a</code>, <code>b</code>, and <code>c</code>. If the named
+parameter sytnax is used (<code>a = v1</code>, etc.), parameters can appear in any
+order.</p>
+<p>More concretely, for the route <code>person</code> defined below:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/person/&lt;name&gt;?&lt;age&gt;&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">person</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">age</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) { }</code></pre></div>
+<p>…a URI can be created as follows:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// with unnamed parameters, in route path declaration order</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="string">&quot;Mike Smith&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike%20Smith?age=28&quot;</span>);
+
+<span class="comment">// with named parameters, order irrelevant</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Mike&quot;</span>, <span class="ident">age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="ident">age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">28</span>), <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Mike&quot;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike?age=28&quot;</span>);
+
+<span class="comment">// with unnamed values, explicitly `None`.</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="string">&quot;Mike&quot;</span>, <span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike&quot;</span>);
+
+<span class="comment">// with named values, explicitly `None`</span>
+<span class="kw">let</span> <span class="ident">option</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Mike&quot;</span>, <span class="ident">age</span> <span class="op">=</span> <span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike&quot;</span>);</code></pre></div>
+<p>For optional query parameters, those of type <code>Option</code> or <code>Result</code>, a <code>_</code> can
+be used in-place of <code>None</code> or <code>Err</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// with named values ignored</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Mike&quot;</span>, <span class="ident">age</span> <span class="op">=</span> <span class="kw">_</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike&quot;</span>);
+
+<span class="comment">// with named values ignored</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="ident">age</span> <span class="op">=</span> <span class="kw">_</span>, <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Mike&quot;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike&quot;</span>);
+
+<span class="comment">// with unnamed values ignored</span>
+<span class="kw">let</span> <span class="ident">mike</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">person</span>(<span class="string">&quot;Mike&quot;</span>, <span class="kw">_</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">mike</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Mike&quot;</span>);</code></pre></div>
+<p>It is a type error to attempt to ignore query parameters that are neither
+<code>Option</code> or <code>Result</code>. Path parameters can never be ignored. A path parameter
+of type <code>Option&lt;T&gt;</code> or <code>Result&lt;T, E&gt;</code> must be filled by a value that can
+target a type of <code>T</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/person/&lt;name&gt;&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">maybe</span>(<span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) { }
+
+<span class="kw">let</span> <span class="ident">bob1</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">maybe</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Bob&quot;</span>));
+<span class="kw">let</span> <span class="ident">bob2</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">maybe</span>(<span class="string">&quot;Bob Smith&quot;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">bob1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Bob&quot;</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">bob2</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Bob%20Smith&quot;</span>);
+
+<span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/person/&lt;age&gt;&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">ok</span>(<span class="ident">age</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) { }
+
+<span class="kw">let</span> <span class="ident">kid1</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">ok</span>(<span class="ident">age</span> <span class="op">=</span> <span class="number">10</span>));
+<span class="kw">let</span> <span class="ident">kid2</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">ok</span>(<span class="number">12</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">kid1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/10&quot;</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">kid2</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/12&quot;</span>);</code></pre></div>
+<p>Values for ignored route segments can be of any type as long as the type
+implements <a href="../rocket/http/uri/fmt/trait.UriDisplay.html"><code>UriDisplay</code></a> for the appropriate URI part. If a route URI
+contains ignored segments, the route URI invocation cannot use named
+arguments.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/ignore/&lt;_&gt;/&lt;other&gt;&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">ignore</span>(<span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) { }
+
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">ignore</span>(<span class="string">&quot;Bob Hope&quot;</span>, <span class="string">&quot;hello&quot;</span>));
+<span class="kw">let</span> <span class="ident">life</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">ignore</span>(<span class="number">42</span>, <span class="string">&quot;cat&amp;dog&quot;</span>));
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/ignore/Bob%20Hope/hello&quot;</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">life</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/ignore/42/cat%26dog&quot;</span>);</code></pre></div>
+<h3 id="prefixes-and-suffixes" class="section-header"><a href="#prefixes-and-suffixes">Prefixes and Suffixes</a></h3>
+<p>A route URI can be be optionally prefixed and/or suffixed by a URI generated
+from a string literal or an arbitrary expression. This takes the form
+<code>uri!(prefix, foo(v1, v2, v3), suffix)</code>, where both <code>prefix</code> and <code>suffix</code>
+are optional, and either <code>prefix</code> or <code>suffix</code> may be <code>_</code> to specify the
+value as empty.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/person/&lt;name&gt;?&lt;age&gt;&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">person</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">age</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) { }
+
+<span class="comment">// with a specific mount-point of `/api`.</span>
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;/api&quot;</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/api/person/Bob?age=28&quot;</span>);
+
+<span class="comment">// with an absolute URI as a prefix</span>
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs&quot;</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;https://rocket.rs/person/Bob?age=28&quot;</span>);
+
+<span class="comment">// with another absolute URI as a prefix</span>
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs/foo&quot;</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;https://rocket.rs/foo/person/Bob?age=28&quot;</span>);
+
+<span class="comment">// with an expression as a prefix</span>
+<span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;http://bob.me&quot;</span>);
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="ident">host</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)));
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;http://bob.me/person/Bob?age=28&quot;</span>);
+
+<span class="comment">// with a suffix but no prefix</span>
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="kw">_</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)), <span class="string">&quot;#baz&quot;</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Bob?age=28#baz&quot;</span>);
+
+<span class="comment">// with both a prefix and suffix</span>
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;https://rocket.rs/&quot;</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)), <span class="string">&quot;#woo&quot;</span>);
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;https://rocket.rs/person/Bob?age=28#woo&quot;</span>);
+
+<span class="comment">// with an expression suffix. if the route URI already has a query, the</span>
+<span class="comment">// query part is ignored. otherwise it is added.</span>
+<span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="string">&quot;?woo#bam&quot;</span>);
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="kw">_</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">Some</span>(<span class="number">28</span>)), <span class="ident">suffix</span>.<span class="ident">clone</span>());
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Bob?age=28#bam&quot;</span>);
+
+<span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="macro">uri!</span>(<span class="kw">_</span>, <span class="ident">person</span>(<span class="string">&quot;Bob&quot;</span>, <span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="ident">suffix</span>.<span class="ident">clone</span>());
+<span class="macro">assert_eq!</span>(<span class="ident">bob</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/person/Bob?woo#bam&quot;</span>);</code></pre></div>
+<h3 id="grammar" class="section-header"><a href="#grammar">Grammar</a></h3>
+<p>The grammar for this variant of the <code>uri!</code> macro is:</p>
+<div class="example-wrap"><pre class="language-text"><code>uri := (prefix &#39;,&#39;)? route
+     | prefix &#39;,&#39; route &#39;,&#39; suffix
+
+prefix := STRING | expr                     ; `Origin` or `Absolute`
+suffix := STRING | expr                     ; `Reference` or `Absolute`
+
+route := PATH &#39;(&#39; (named | unnamed) &#39;)&#39;
+
+named := IDENT = expr (&#39;,&#39; named)? &#39;,&#39;?
+unnamed := expr (&#39;,&#39; unnamed)? &#39;,&#39;?
+
+expr := EXPR | &#39;_&#39;
+
+EXPR := a valid Rust expression (examples: `foo()`, `12`, `&quot;hey&quot;`)
+IDENT := a valid Rust identifier (examples: `name`, `age`)
+STRING := an uncooked string literal, as defined by Rust (example: `&quot;hi&quot;`)
+PATH := a path, as defined by Rust (examples: `route`, `my_mod::route`)</code></pre></div><h3 id="dynamic-semantics" class="section-header"><a href="#dynamic-semantics">Dynamic Semantics</a></h3>
+<p>The returned value is that of the prefix (minus any query part) concatenated
+with the route URI concatenated with the query (if the route has no query
+part) and fragment parts of the suffix. The route URI is generated by
+interpolating the declared route URI with the URL-safe version of the route
+values in <code>uri!()</code>. The generated URI is guaranteed to be URI-safe.</p>
+<p>Each route value is rendered in its appropriate place in the URI using the
+<a href="../rocket/http/uri/fmt/trait.UriDisplay.html"><code>UriDisplay</code></a> implementation for the value’s type. The <code>UriDisplay</code>
+implementation ensures that the rendered value is URL-safe.</p>
+<p>A <code>uri!()</code> invocation allocated at-most once.</p>
+<h3 id="static-semantics" class="section-header"><a href="#static-semantics">Static Semantics</a></h3>
+<p>The <code>uri!</code> macro returns one of <a href="../rocket/http/uri/struct.Origin.html"><code>Origin</code></a>, <a href="../rocket/http/uri/struct.Absolute.html"><code>Absolute</code></a>, or <a href="../rocket/http/uri/struct.Reference.html"><code>Reference</code></a>,
+depending on the types of the prefix and suffix, if any. The table below
+specifies all combinations:</p>
+<div><table><thead><tr><th>Prefix</th><th>Suffix</th><th>Output</th></tr></thead><tbody>
+<tr><td>None</td><td>None</td><td><code>Origin</code></td></tr>
+<tr><td>None</td><td><code>Absolute</code></td><td><code>Origin</code></td></tr>
+<tr><td>None</td><td><code>Reference</code></td><td><code>Reference</code></td></tr>
+<tr><td><code>Origin</code></td><td>None</td><td><code>Origin</code></td></tr>
+<tr><td><code>Origin</code></td><td><code>Absolute</code></td><td><code>Origin</code></td></tr>
+<tr><td><code>Origin</code></td><td><code>Reference</code></td><td><code>Reference</code></td></tr>
+<tr><td><code>Absolute</code></td><td>None</td><td><code>Absolute</code></td></tr>
+<tr><td><code>Absolute</code></td><td><code>Absolute</code></td><td><code>Absolute</code></td></tr>
+<tr><td><code>Absolute</code></td><td><code>Reference</code></td><td><code>Reference</code></td></tr>
+</tbody></table>
+</div>
+<p>A <code>uri!</code> invocation only typechecks if the type of every route URI value in
+the invocation matches the type declared for the parameter in the given
+route, after conversion with <a href="../rocket/http/uri/fmt/trait.FromUriParam.html"><code>FromUriParam</code></a>, or if a value is ignored
+using <code>_</code> and the corresponding route type implements <a href="../rocket/http/uri/fmt/trait.Ignorable.html"><code>Ignorable</code></a>.</p>
+<h4 id="conversion" class="section-header"><a href="#conversion">Conversion</a></h4>
+<p>The <a href="../rocket/http/uri/fmt/trait.FromUriParam.html"><code>FromUriParam</code></a> trait is used to typecheck and perform a conversion for
+each value passed to <code>uri!</code>. If a <code>FromUriParam&lt;P, S&gt; for T</code> implementation
+exists for a type <code>T</code> for part URI part <code>P</code>, then a value of type <code>S</code> can be
+used in <code>uri!</code> macro for a route URI parameter declared with a type of <code>T</code>
+in part <code>P</code>. For example, the following implementation, provided by Rocket,
+allows an <code>&amp;str</code> to be used in a <code>uri!</code> invocation for route URI parameters
+declared as <code>String</code>:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Part</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromUriParam</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> { .. }</code></pre></div>
+<h4 id="ignorables" class="section-header"><a href="#ignorables">Ignorables</a></h4>
+<p>Query parameters can be ignored using <code>_</code> in place of an expression. The
+corresponding type in the route URI must implement <a href="../rocket/http/uri/fmt/trait.Ignorable.html"><code>Ignorable</code></a>. Ignored
+parameters are not interpolated into the resulting <code>Origin</code>. Path parameters
+are not ignorable.</p>
+</div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rocket_codegen" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

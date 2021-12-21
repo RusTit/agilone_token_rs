@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Trait implemented by `Catcher` error handlers."><meta name="keywords" content="rust, rustlang, rust-lang, Handler"><title>Handler in rocket::catcher - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rocket/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;logo-boxed.png' alt='logo'></div></a><h2 class="location">Trait Handler</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#required-methods">Required Methods</a></h3><div class="sidebar-links"><a href="#tymethod.handle">handle</a></div><h3 class="sidebar-title"><a href="#implementors">Implementors</a></h3></div><h2 class="location">Other items in<br><a href="../index.html">rocket</a>::<wbr><a href="index.html">catcher</a></h2><div id="sidebar-vars" data-name="Handler" data-ty="trait" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Trait <a href="../index.html">rocket</a>::<wbr><a href="index.html">catcher</a>::<wbr><a class="trait" href="#">Handler</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/rocket/catcher/handler.rs.html#92-101" title="goto source code">[src]</a></span></h1><div class="docblock type-decl"><pre class="rust trait"><code>pub trait Handler: <a class="trait" href="trait.Cloneable.html" title="trait rocket::catcher::Cloneable">Cloneable</a> + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static {
+    fn <a href="#tymethod.handle" class="fnname">handle</a>&lt;'r, 'life0, 'life1, 'async_trait&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;'life0 self, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status: <a class="struct" href="../http/struct.Status.html" title="struct rocket::http::Status">Status</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;req: &amp;'r <a class="struct" href="../request/struct.Request.html" title="struct rocket::request::Request">Request</a>&lt;'life1&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.57.0/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.57.0/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="type" href="type.Result.html" title="type rocket::catcher::Result">Result</a>&lt;'r&gt;&gt; + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'r: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'life0: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'life1: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: 'async_trait</span>;
+}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Trait implemented by <a href="struct.Catcher.html"><code>Catcher</code></a> error handlers.</p>
+<p>This trait is exactly like a <a href="../route/struct.Route.html"><code>Route</code></a>’s
+<a href="../route/trait.Handler.html"><code>Handler</code></a> except it handles errors instead of
+requests. Thus, the documentation for
+<a href="../route/trait.Handler.html"><code>route::Handler</code></a> applies to this trait as well. We
+defer to it for full details.</p>
+<h3 id="async-trait" class="section-header"><a href="#async-trait">Async Trait</a></h3>
+<p>This is an <em>async</em> trait. Implementations must be decorated
+<a href="../attr.async_trait.html"><code>#[rocket::async_trait]</code></a>.</p>
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
+<p>Say you’d like to write a handler that changes its functionality based on a
+<code>Kind</code> enum value that the user provides. Such a handler might be written
+and used as follows:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rocket</span>::{<span class="ident">Request</span>, <span class="ident">Catcher</span>, <span class="ident">catcher</span>};
+<span class="kw">use</span> <span class="ident">rocket::response</span>::{<span class="ident">Response</span>, <span class="ident">Responder</span>};
+<span class="kw">use</span> <span class="ident">rocket::http::Status</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">enum</span> <span class="ident">Kind</span> {
+    <span class="ident">Simple</span>,
+    <span class="ident">Intermediate</span>,
+    <span class="ident">Complex</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">struct</span> <span class="ident">CustomHandler</span>(<span class="ident">Kind</span>);
+
+<span class="attribute">#[<span class="ident">rocket::async_trait</span>]</span>
+<span class="kw">impl</span> <span class="ident">catcher::Handler</span> <span class="kw">for</span> <span class="ident">CustomHandler</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">status</span>: <span class="ident">Status</span>, <span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">catcher::Result</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
+            <span class="ident">Kind::Simple</span> =&gt; <span class="string">&quot;simple&quot;</span>.<span class="ident">respond_to</span>(<span class="ident">req</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Intermediate</span> =&gt; <span class="string">&quot;intermediate&quot;</span>.<span class="ident">respond_to</span>(<span class="ident">req</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Complex</span> =&gt; <span class="string">&quot;complex&quot;</span>.<span class="ident">respond_to</span>(<span class="ident">req</span>)<span class="question-mark">?</span>,
+        };
+
+        <span class="ident">Response::build_from</span>(<span class="ident">inner</span>).<span class="ident">status</span>(<span class="ident">status</span>).<span class="ident">ok</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">CustomHandler</span> {
+    <span class="doccomment">/// Returns a `default` catcher that uses `CustomHandler`.</span>
+    <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Catcher</span><span class="op">&gt;</span> {
+        <span class="macro">vec!</span>[<span class="ident">Catcher::new</span>(<span class="prelude-val">None</span>, <span class="ident">CustomHandler</span>(<span class="ident">kind</span>))]
+    }
+
+    <span class="doccomment">/// Returns a catcher for code `status` that uses `CustomHandler`.</span>
+    <span class="kw">fn</span> <span class="ident">catch</span>(<span class="ident">status</span>: <span class="ident">Status</span>, <span class="ident">kind</span>: <span class="ident">Kind</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Catcher</span><span class="op">&gt;</span> {
+        <span class="macro">vec!</span>[<span class="ident">Catcher::new</span>(<span class="ident">status</span>.<span class="ident">code</span>, <span class="ident">CustomHandler</span>(<span class="ident">kind</span>))]
+    }
+}
+
+<span class="attribute">#[<span class="ident">rocket::launch</span>]</span>
+<span class="kw">fn</span> <span class="ident">rocket</span>() -&gt; <span class="kw">_</span> {
+    <span class="ident">rocket::build</span>()
+        <span class="comment">// to handle only `404`</span>
+        .<span class="ident">register</span>(<span class="string">&quot;/&quot;</span>, <span class="ident">CustomHandler::catch</span>(<span class="ident">Status::NotFound</span>, <span class="ident">Kind::Simple</span>))
+        <span class="comment">// or to register as the default</span>
+        .<span class="ident">register</span>(<span class="string">&quot;/&quot;</span>, <span class="ident">CustomHandler::default</span>(<span class="ident">Kind::Simple</span>))
+}</code></pre></div>
+<p>Note the following:</p>
+<ol>
+<li><code>CustomHandler</code> implements <code>Clone</code>. This is required so that
+<code>CustomHandler</code> implements <code>Cloneable</code> automatically. The <code>Cloneable</code>
+trait serves no other purpose but to ensure that every <code>Handler</code>
+can be cloned, allowing <code>Catcher</code>s to be cloned.</li>
+<li><code>CustomHandler</code>’s methods return <code>Vec&lt;Route&gt;</code>, allowing for use
+directly as the parameter to <code>rocket.register(&quot;/&quot;, )</code>.</li>
+<li>Unlike static-function-based handlers, this custom handler can make use
+of internal state.</li>
+</ol>
+</div></details><h2 id="required-methods" class="small-section-header">Required methods<a href="#required-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="tymethod.handle" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/rocket/catcher/handler.rs.html#100" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#tymethod.handle" class="fnname">handle</a>&lt;'r, 'life0, 'life1, 'async_trait&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;'life0 self, <br>&nbsp;&nbsp;&nbsp;&nbsp;status: <a class="struct" href="../http/struct.Status.html" title="struct rocket::http::Status">Status</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;req: &amp;'r <a class="struct" href="../request/struct.Request.html" title="struct rocket::request::Request">Request</a>&lt;'life1&gt;<br>) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.57.0/core/pin/struct.Pin.html" title="struct core::pin::Pin">Pin</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.57.0/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a>&lt;Output = <a class="type" href="type.Result.html" title="type rocket::catcher::Result">Result</a>&lt;'r&gt;&gt; + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'async_trait&gt;&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;'r: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;'life0: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;'life1: 'async_trait,<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: 'async_trait,&nbsp;</span></h4></div></summary><div class="docblock"><p>Called by Rocket when an error with <code>status</code> for a given <code>Request</code>
+should be handled by this handler.</p>
+<p>Error handlers <em>should not</em> fail and thus <em>should</em> always return <code>Ok</code>.
+Nevertheless, failure is allowed, both for convenience and necessity. If
+an error handler fails, Rocket’s default <code>500</code> catcher is invoked. If it
+succeeds, the returned <code>Response</code> is used to respond to the client.</p>
+</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><div id="impl-Handler" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/rocket/catcher/handler.rs.html#104-119" title="goto source code">[src]</a></div><a href="#impl-Handler" class="anchor"></a><h3 class="code-header in-band">impl&lt;F:&nbsp;<a class="trait" href="https://doc.rust-lang.org/1.57.0/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static&gt; <a class="trait" href="trait.Handler.html" title="trait rocket::catcher::Handler">Handler</a> for F <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;for&lt;'x&gt; F: <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="struct" href="../http/struct.Status.html" title="struct rocket::http::Status">Status</a>, &amp;'x <a class="struct" href="../request/struct.Request.html" title="struct rocket::request::Request">Request</a>&lt;'_&gt;) -&gt; <a class="type" href="type.BoxFuture.html" title="type rocket::catcher::BoxFuture">BoxFuture</a>&lt;'x&gt;,&nbsp;</span></h3></div></div><script type="text/javascript" src="../../implementors/rocket/catcher/trait.Handler.js" async></script></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rocket" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script>
+</body></html>

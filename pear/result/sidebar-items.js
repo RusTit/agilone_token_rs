@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["Result","An alias to a Result where:"]]});

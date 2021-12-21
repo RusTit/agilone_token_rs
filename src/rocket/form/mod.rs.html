@@ -1,0 +1,806 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rocket-0.5.0-rc.1&#x2F;src&#x2F;form&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rocket/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;logo-boxed.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parsing and validation of HTTP forms and fields.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! See the [forms guide](https://rocket.rs/v0.5-rc/guide/requests#forms) for</span>
+<span class="doccomment">//! general form support documentation.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Field Wire Format</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Rocket&#39;s field wire format is a flexible, non-self-descriptive, text-based</span>
+<span class="doccomment">//! encoding of arbitrarily nested structure keys and their corresponding</span>
+<span class="doccomment">//! values. The general grammar is:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```ebnf</span>
+<span class="doccomment">//! field := name (&#39;=&#39; value)?</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! name := key*</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! key := indices</span>
+<span class="doccomment">//!       | &#39;[&#39; indices &#39;]&#39;</span>
+<span class="doccomment">//!       | &#39;.&#39; indices</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! indices := index (&#39;:&#39; index)*</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! index := STRING except &#39;:&#39;, &#39;]&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! value := STRING</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Each field name consists of any number of `key`s and at most one `value`.</span>
+<span class="doccomment">//! Keys are delimited by `[` or `.`. A `key` consists of indices delimited by</span>
+<span class="doccomment">//! `:`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The meaning of a key or index is type-dependent, hence the format is</span>
+<span class="doccomment">//! non-self-descriptive. _Any_ structure can be described by this format. The</span>
+<span class="doccomment">//! delimiters `.`, `[`, `:`, and `]` have no semantic meaning.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Some examples of valid fields are:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   * `=`</span>
+<span class="doccomment">//!   * `key=value`</span>
+<span class="doccomment">//!   * `key[]=value`</span>
+<span class="doccomment">//!   * `.0=value`</span>
+<span class="doccomment">//!   * `[0]=value`</span>
+<span class="doccomment">//!   * `people[].name=Bob`</span>
+<span class="doccomment">//!   * `bob.cousin.names[]=Bob`</span>
+<span class="doccomment">//!   * `map[k:1]=Bob`</span>
+<span class="doccomment">//!   * `people[bob]nickname=Stan`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! See [`FromForm`] for full details on push-parsing and complete examples.</span>
+
+<span class="comment">// ## Maps w/named Fields (`struct`)</span>
+<span class="comment">//</span>
+<span class="comment">// A `struct` with named fields parses values of multiple types, indexed by the</span>
+<span class="comment">// name of its fields:</span>
+<span class="comment">//</span>
+<span class="comment">// ```rust,ignore</span>
+<span class="comment">// struct Dog { name: String, barks: bool, friends: Vec&lt;Cat&gt;, }</span>
+<span class="comment">// struct Cat { name: String, meows: bool }</span>
+<span class="comment">// ```</span>
+<span class="comment">//</span>
+<span class="comment">// Candidates for parsing into a `Dog` include:</span>
+<span class="comment">//</span>
+<span class="comment">//   * `name=Fido&amp;barks=0`</span>
+<span class="comment">//</span>
+<span class="comment">//     `Dog { &quot;Fido&quot;, false }`</span>
+<span class="comment">//</span>
+<span class="comment">//   * `name=Fido&amp;barks=1&amp;friends[0]name=Sally&amp;friends[0]meows=0`</span>
+<span class="comment">//     `name=Fido&amp;barks=1&amp;friends[0].name=Sally&amp;friends[0].meows=0`</span>
+<span class="comment">//     `name=Fido&amp;barks=1&amp;friends.0.name=Sally&amp;friends.0.meows=0`</span>
+<span class="comment">//</span>
+<span class="comment">//     `Dog { &quot;Fido&quot;, true, vec![Cat { &quot;Sally&quot;, false }] }`</span>
+<span class="comment">//</span>
+<span class="comment">// Parsers for structs are code-generated to proceed as follows:</span>
+<span class="comment">//</span>
+<span class="comment">//   1. **Initialization.** The context stores parsing options, a `T::Context`</span>
+<span class="comment">//      for each field of type `T`, and a vector called `extra`.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      struct Context&lt;&#39;v&gt; {</span>
+<span class="comment">//          opts: FormOptions,</span>
+<span class="comment">//          field_a: A::Context,</span>
+<span class="comment">//          field_b: B::Context,</span>
+<span class="comment">//          /* ... */</span>
+<span class="comment">//          extra: Vec&lt;FormField&lt;&#39;v&gt;&gt;</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   2. **Push.** The index of the first key is compared to known field names.</span>
+<span class="comment">//      If none matches, the index is added to `extra`. Otherwise the key is</span>
+<span class="comment">//      stripped from the field, and the remaining field is pushed to `T`.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn push(this: &amp;mut Self::Context, field: FormField&lt;&#39;v&gt;) {</span>
+<span class="comment">//          match field.key() {</span>
+<span class="comment">//              &quot;field_a&quot; =&gt; A::push(&amp;mut this.field_a, field.next()),</span>
+<span class="comment">//              &quot;field_b&quot; =&gt; B::push(&amp;mut this.field_b, field.next()),</span>
+<span class="comment">//              /* ... */</span>
+<span class="comment">//              _ =&gt; this.extra.push(field)</span>
+<span class="comment">//          }</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   3. **Finalization.** Every context is finalized; errors and `Ok` values</span>
+<span class="comment">//      are collected. If parsing is strict and extras is non-empty, an error</span>
+<span class="comment">//      added to the collection of errors. If there are no errors, all `Ok`</span>
+<span class="comment">//      values are used to create the `struct`, and the created struct is</span>
+<span class="comment">//      returned. Otherwise, `Err(errors)` is returned.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn finalize(mut this: Self::Context) -&gt; Result&lt;Self, Self::Error&gt; {</span>
+<span class="comment">//          let mut errors = vec![];</span>
+<span class="comment">//</span>
+<span class="comment">//          let field_a = A::finalize(&amp;mut this.field_a)</span>
+<span class="comment">//             .map_err(|e| errors.push(e))</span>
+<span class="comment">//             .map(Some).unwrap_or(None);</span>
+<span class="comment">//</span>
+<span class="comment">//          let field_b = B::finblize(&amp;mut this.field_b)</span>
+<span class="comment">//             .map_err(|e| errors.push(e))</span>
+<span class="comment">//             .map(Some).unwrap_or(None);</span>
+<span class="comment">//</span>
+<span class="comment">//          /* .. */</span>
+<span class="comment">//</span>
+<span class="comment">//          if !errors.is_empty() {</span>
+<span class="comment">//              return Err(Values(errors));</span>
+<span class="comment">//          } else if this.opts.is_strict() &amp;&amp; !this.extra.is_empty() {</span>
+<span class="comment">//              return Err(Extra(this.extra));</span>
+<span class="comment">//          } else {</span>
+<span class="comment">//              // NOTE: All unwraps will succeed since `errors.is_empty()`.</span>
+<span class="comment">//              Struct {</span>
+<span class="comment">//                 field_a: field_a.unwrap(),</span>
+<span class="comment">//                 field_b: field_b.unwrap(),</span>
+<span class="comment">//                 /* .. */</span>
+<span class="comment">//              }</span>
+<span class="comment">//          }</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">// ## Sequences: (`Vec&lt;T: FromForm&gt;`)</span>
+<span class="comment">//</span>
+<span class="comment">// A `Vec&lt;T: FromForm&gt;` invokes `T`&#39;s push-parser on every push, adding instances</span>
+<span class="comment">// of `T` to an internal vector. The instance of `T` whose parser is invoked</span>
+<span class="comment">// depends on the index of the first key:</span>
+<span class="comment">//</span>
+<span class="comment">//   * if it is the first push, the index differs from the previous, or there is no</span>
+<span class="comment">//     index, a new `T::Context` is `init`ialized and added to the internal vector</span>
+<span class="comment">//   * if the index matches the previously seen index, the last initialized</span>
+<span class="comment">//     `T::Context` is `push`ed to.</span>
+<span class="comment">//</span>
+<span class="comment">// For instance, the sequentially pushed values `=1`, `=2`, and `=3` for a</span>
+<span class="comment">// `Vec&lt;usize&gt;` (or any other integer) is expected to parse as `vec![1, 2, 3]`. The</span>
+<span class="comment">// same is true for `[]=1&amp;[]=2&amp;[]=3`. In the first example (`=1&amp;..`), the fields</span>
+<span class="comment">// passed to `Vec`&#39;s push-parser (`=1`, ..) have no key and thus no index. In the</span>
+<span class="comment">// second example (`[]=1&amp;..`), the key is `[]` (`[]=1`) without an index. In both</span>
+<span class="comment">// cases, there is no index. The `Vec` parser takes this to mean that a _new_ `T`</span>
+<span class="comment">// should be parsed using the field&#39;s value.</span>
+<span class="comment">//</span>
+<span class="comment">// If, instead, the index was non-empty and equal to the index of the field in the</span>
+<span class="comment">// _previous_ push, `Vec` pushes the value to the parser of the previously parsed</span>
+<span class="comment">// `T`: `[]=1&amp;[0]=2&amp;[0]=3` results in `vec![1, 2]` and `[0]=1&amp;[0]=2&amp;[]=3` results</span>
+<span class="comment">// in `vec![1, 3]` (see [`FromFormValue`]).</span>
+<span class="comment">//</span>
+<span class="comment">// This generalizes. Consider a `Vec&lt;Vec&lt;usize&gt;&gt;` named `x`, so `x` and an</span>
+<span class="comment">// optional `=` are stripped before being passed to `Vec`&#39;s push-parser:</span>
+<span class="comment">//</span>
+<span class="comment">//   * `x=1&amp;x=2&amp;x=3` parses as `vec![vec![1], vec![2], vec![3]]`</span>
+<span class="comment">//</span>
+<span class="comment">//     Every push (`1`, `2`, `3`) has no key, thus no index: a new `T` (here,</span>
+<span class="comment">//     `Vec&lt;usize&gt;`) is thus initialized for every `push()` and passed the</span>
+<span class="comment">//     value (here, `1`, `2`, and `3`). Each of these `push`es proceeds</span>
+<span class="comment">//     recursively: every push again has no key, thus no index, so a new `T` is</span>
+<span class="comment">//     initialized for every push (now a `usize`), which finally parse as</span>
+<span class="comment">//     integers `1`, `2`, and `3`.</span>
+<span class="comment">//</span>
+<span class="comment">//     Note: `x=1&amp;x=2&amp;x=3` _also_ can also parse as `vec![1, 2, 3]` when viewed</span>
+<span class="comment">//     as a `Vec&lt;usize&gt;`; this is the non-self-descriptive part of the format.</span>
+<span class="comment">//</span>
+<span class="comment">//   * `x[]=1&amp;x[]=2&amp;x[]=3` parses as `vec![vec![1], vec![2], vec![3]]`</span>
+<span class="comment">//</span>
+<span class="comment">//     This proceeds nearly identically to the previous example, with the exception</span>
+<span class="comment">//     that the top-level `Vec` sees the values `[]=1`, `[]=2`, and `[]=3`.</span>
+<span class="comment">//</span>
+<span class="comment">//   * `x[0]=1&amp;x[0]=2&amp;x[]=3` parses as `vec![vec![1, 2], vec![3]]`</span>
+<span class="comment">//</span>
+<span class="comment">//     The top-level `Vec` sees the values `[0]=1`, `[0]=2`, and `[]=3`. The first</span>
+<span class="comment">//     value results in a new `Vec&lt;usize&gt;` being initialized, as before, which is</span>
+<span class="comment">//     pushed a `1`. The second value has the same index as the first, `0`, and so</span>
+<span class="comment">//     `2` is pushed to the previous `T`, the `Vec` which contains the `1`.</span>
+<span class="comment">//     Finally, the third value has no index, so a new `Vec&lt;usize&gt;` is initialized</span>
+<span class="comment">//     and pushed a `3`.</span>
+<span class="comment">//</span>
+<span class="comment">//   * `x[0]=1&amp;x[0]=2&amp;x[]=3&amp;x[]=4` parses as `vec![vec![1, 2], vec![3], vec![4]]`</span>
+<span class="comment">//   * `x[0]=1&amp;x[0]=2&amp;x[1]=3&amp;x[1]=4` parses as `vec![vec![1, 2], vec![3, 4]]`</span>
+<span class="comment">//</span>
+<span class="comment">// The indexing kind `[]` is purely by convention: the first two examples are</span>
+<span class="comment">// equivalent to `x.=1&amp;x.=2`, while the third to `x.0=1&amp;x.0=&amp;x.=3`.</span>
+<span class="comment">//</span>
+<span class="comment">// The parser proceeds as follows:</span>
+<span class="comment">//</span>
+<span class="comment">//   1. **Initialization.** The context stores parsing options, the</span>
+<span class="comment">//      `last_index` encountered in a `push`, an `Option` of a `T::Context` for</span>
+<span class="comment">//      the `current` value being parsed, a `Vec&lt;T::Errors&gt;` of `errors`, and</span>
+<span class="comment">//      finally a `Vec&lt;T&gt;` of already parsed `items`.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      struct VecContext&lt;&#39;v, T: FromForm&lt;&#39;v&gt;&gt; {</span>
+<span class="comment">//          opts: FormOptions,</span>
+<span class="comment">//          last_index: Index&lt;&#39;v&gt;,</span>
+<span class="comment">//          current: Option&lt;T::Context&gt;,</span>
+<span class="comment">//          errors: Vec&lt;T::Error&gt;,</span>
+<span class="comment">//          items: Vec&lt;T&gt;</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   2. **Push.** The index of the first key is compared against `last_index`.</span>
+<span class="comment">//      If it differs, a new context for `T` is created and the previous is</span>
+<span class="comment">//      finalized. The `Ok` result from finalization is stored in `items` and</span>
+<span class="comment">//      the `Err` in `errors`. Otherwise the `index` is the same, the `current`</span>
+<span class="comment">//      context is retrieved, and the field stripped of the current key is</span>
+<span class="comment">//      pushed to `T`. `last_index` is updated.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn push(this: &amp;mut Self::Context, field: FormField&lt;&#39;v&gt;) {</span>
+<span class="comment">//          if this.last_index != field.index() {</span>
+<span class="comment">//              this.shift(); // finalize `current`, add to `items`, `errors`</span>
+<span class="comment">//              let mut context = T::init(this.opts);</span>
+<span class="comment">//              T::push(&amp;mut context, field.next());</span>
+<span class="comment">//              this.current = Some(context);</span>
+<span class="comment">//          } else {</span>
+<span class="comment">//              let context = this.current.as_mut();</span>
+<span class="comment">//              T::push(context, field.next())</span>
+<span class="comment">//          }</span>
+<span class="comment">//</span>
+<span class="comment">//          this.last_index = field.index();</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   3. **Finalization.** Any `current` context is finalized, storing the `Ok`</span>
+<span class="comment">//      or `Err` as before. `Ok(items)` is returned if `errors` is empty,</span>
+<span class="comment">//      otherwise `Err(errors)` is returned.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn finalize(mut this: Self::Context) -&gt; Result&lt;Self, Self::Error&gt; {</span>
+<span class="comment">//          this.shift(); // finalizes `current`, as before.</span>
+<span class="comment">//          match this.errors.is_empty() {</span>
+<span class="comment">//              true =&gt; Ok(this.items),</span>
+<span class="comment">//              false =&gt; Err(this.errors)</span>
+<span class="comment">//          }</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">// ## Arbitrary Maps (`HashMap&lt;K: FromForm, V: FromForm&gt;`)</span>
+<span class="comment">//</span>
+<span class="comment">// A `HashMap&lt;K, V&gt;` can be parsed from keys with one index or, for composite</span>
+<span class="comment">// key values, such as structures or sequences, multiple indices. We begin with</span>
+<span class="comment">// a discussion of the simpler case: non-composite keys.</span>
+<span class="comment">//</span>
+<span class="comment">// ### Non-Composite Keys</span>
+<span class="comment">//</span>
+<span class="comment">// A non-composite value can be described by a single field with no indices.</span>
+<span class="comment">// Strings and integers are examples of non-composite values. The push-parser</span>
+<span class="comment">// for `HashMap&lt;K, V&gt;` for a non-composite `K` uses the index of the first key</span>
+<span class="comment">// as the value of `K`; the remainder of the field is pushed to `V`&#39;s parser:</span>
+<span class="comment">//</span>
+<span class="comment">//   1. **Initialization.** The context stores a column-based representation of</span>
+<span class="comment">//      `keys` and `values`, a `key_map` from a string key to the column index,</span>
+<span class="comment">//      an `errors` vector for storing errors as they arise, and the parsing</span>
+<span class="comment">//      options.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      struct MapContext&lt;&#39;v, K: FromForm&lt;&#39;v&gt;, V: FromForm&lt;&#39;v&gt;&gt; {</span>
+<span class="comment">//          opts: FormOptions,</span>
+<span class="comment">//          key_map: HashMap&lt;&amp;&#39;v str, usize&gt;,</span>
+<span class="comment">//          keys: Vec&lt;K::Context&gt;,</span>
+<span class="comment">//          values: Vec&lt;V::Context&gt;,</span>
+<span class="comment">//          errors: Vec&lt;MapError&lt;&#39;v, K::Error, V::Error&gt;&gt;,</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   2. **Push.** The `key_map` index for the key associated with the index of</span>
+<span class="comment">//      the first key in the field is retrieved. If such a key has not yet been</span>
+<span class="comment">//      seen, a new key and value context are created, the key is pushed to</span>
+<span class="comment">//      `K`&#39;s parser, and the field minus the first key is pushed to `V`&#39;s</span>
+<span class="comment">//      parser.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn push(this: &amp;mut Self::Context, field: FormField&lt;&#39;v&gt;) {</span>
+<span class="comment">//          let key = field.index();</span>
+<span class="comment">//          let value_context = match this.key_map.get(Key) {</span>
+<span class="comment">//              Some(i) =&gt; &amp;mut this.values[i],</span>
+<span class="comment">//              None =&gt; {</span>
+<span class="comment">//                  let i = this.keys.len();</span>
+<span class="comment">//                  this.key_map.insert(key, i);</span>
+<span class="comment">//                  this.keys.push(K::init(this.opts));</span>
+<span class="comment">//                  this.values.push(V::init(this.opts));</span>
+<span class="comment">//                  K::push(&amp;mut this.keys[i], key.into());</span>
+<span class="comment">//                  &amp;mut this.values[i]</span>
+<span class="comment">//              }</span>
+<span class="comment">//          };</span>
+<span class="comment">//</span>
+<span class="comment">//          V::push(value_context, field.next());</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">//   3. **Finalization.** All key and value contexts are finalized; any errors</span>
+<span class="comment">//      are collected in `errors`. If there are no errors, `keys` and `values`</span>
+<span class="comment">//      are collected into a `HashMap` and returned. Otherwise, the errors are</span>
+<span class="comment">//      returned.</span>
+<span class="comment">//</span>
+<span class="comment">//      ```rust,ignore</span>
+<span class="comment">//      fn finalize(mut this: Self::Context) -&gt; Result&lt;Self, Self::Error&gt; {</span>
+<span class="comment">//          this.finalize_keys();</span>
+<span class="comment">//          this.finalize_values();</span>
+<span class="comment">//          if this.errors.is_empty() {</span>
+<span class="comment">//              Ok(this.keys.into_iter().zip(this.values.into_iter()).collect())</span>
+<span class="comment">//          } else {</span>
+<span class="comment">//              Err(this.errors)</span>
+<span class="comment">//          }</span>
+<span class="comment">//      }</span>
+<span class="comment">//      ```</span>
+<span class="comment">//</span>
+<span class="comment">// Examples of forms parseable via this parser are:</span>
+<span class="comment">//</span>
+<span class="comment">//   * `x[0].name=Bob&amp;x[0].meows=true`as a `HashMap&lt;usize, Cat&gt;` parses with</span>
+<span class="comment">//     `0` mapping to `Cat { name: &quot;Bob&quot;, meows: true }`</span>
+<span class="comment">//   * `x[0]name=Bob&amp;x[0]meows=true`as a `HashMap&lt;usize, Cat&gt;` parses just as</span>
+<span class="comment">//      above.</span>
+<span class="comment">//   * `x[0]=Bob&amp;x[0]=Sally&amp;x[1]=Craig`as a `HashMap&lt;usize, Vec&lt;String&gt;&gt;`</span>
+<span class="comment">//      just as `{ 0 =&gt; vec![&quot;Bob&quot;, &quot;Sally&quot;], 1 =&gt; vec![&quot;Craig&quot;] }`.</span>
+<span class="comment">//</span>
+<span class="comment">// A `HashMap&lt;K, V&gt;` can be thought of as a vector of key-value pairs: `Vec&lt;(K,</span>
+<span class="comment">// V)` (row-based) or equivalently, as two vectors of keys and values: `Vec&lt;K&gt;`</span>
+<span class="comment">// and `Vec&lt;V&gt;` (column-based). The implication is that indexing into a</span>
+<span class="comment">// specific key or value requires _two_ indexes: the first to determine whether</span>
+<span class="comment">// a key or value is being indexed to, and the second to determine _which_ key</span>
+<span class="comment">// or value. The push-parser for maps thus optionally accepts two indexes for a</span>
+<span class="comment">// single key to allow piece-by-piece build-up of arbitrary keys and values.</span>
+<span class="comment">//</span>
+<span class="comment">// The parser proceeds as follows:</span>
+<span class="comment">//</span>
+<span class="comment">//   1. **Initialization.** The context stores parsing options, a vector of</span>
+<span class="comment">//      `key_contexts: Vec&lt;K::Context&gt;`, a vector of `value_contexts:</span>
+<span class="comment">//      Vec&lt;V::Context&gt;`, a `mapping` from a string index to an integer index</span>
+<span class="comment">//      into the `contexts`, and a vector of `errors`.</span>
+<span class="comment">//   2. **Push.** An index is required; an error is emitted and `push` returns</span>
+<span class="comment">//      if they field&#39;s first key does not contain an index. If the first key</span>
+<span class="comment">//      contains _one_ index, a new `K::Context` and `V::Context` are created.</span>
+<span class="comment">//      The key is pushed as the value to `K` and the remaining field as the</span>
+<span class="comment">//      value to `V`. The key and value are finalized; if both succeed, the key</span>
+<span class="comment">//      and value are stored in `keys` and `values`; otherwise the error(s) is</span>
+<span class="comment">//      stored in `errors`.</span>
+<span class="comment">//</span>
+<span class="comment">//      If the first keys contains _two_ indices, the first must starts with</span>
+<span class="comment">//      `k` or `v`, while the `second` is arbitrary. `mapping` is indexed by</span>
+<span class="comment">//      `second`; the integer is retrieved. If none exists, new contexts are</span>
+<span class="comment">//      created an added to `{key,value}_contexts`, and their index is mapped</span>
+<span class="comment">//      to `second` in `mapping`. If the first index is `k`, the field,</span>
+<span class="comment">//      stripped of the first key, is pushed to the key&#39;s context; the same is</span>
+<span class="comment">//      done for the value&#39;s context is the first index is `v`.</span>
+<span class="comment">//   3. **Finalization.** Every context is finalized; errors and `Ok` values</span>
+<span class="comment">//      are collected. TODO: FINISH. Split this into two: one for single-index,</span>
+<span class="comment">//      another for two-indices.</span>
+
+<span class="kw">mod</span> <span class="ident">field</span>;
+<span class="kw">mod</span> <span class="ident">options</span>;
+<span class="kw">mod</span> <span class="ident">from_form</span>;
+<span class="kw">mod</span> <span class="ident">from_form_field</span>;
+<span class="kw">mod</span> <span class="ident">form</span>;
+<span class="kw">mod</span> <span class="ident">context</span>;
+<span class="kw">mod</span> <span class="ident">strict</span>;
+<span class="kw">mod</span> <span class="ident">lenient</span>;
+<span class="kw">mod</span> <span class="ident">parser</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">validate</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">name</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span>;
+
+<span class="doccomment">/// Type alias for `Result` with an error type of [`Errors`].</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Errors</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rocket_codegen</span>::{<span class="ident">FromForm</span>, <span class="ident">FromFormField</span>};
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error</span>::{<span class="ident">Errors</span>, <span class="ident">Error</span>};
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">options</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">from_form_field</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">from_form</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">form</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">strict</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lenient</span>::<span class="kw-2">*</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::name</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::error</span>::<span class="kw-2">*</span>;
+}
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rocket" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

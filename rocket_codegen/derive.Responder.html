@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Derive for the `Responder` trait."><meta name="keywords" content="rust, rustlang, rust-lang, Responder"><title>Responder in rocket_codegen - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../rocket_codegen/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;rocket.rs&#x2F;images&#x2F;logo-boxed.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="index.html">rocket_codegen</a></h2><div id="sidebar-vars" data-name="Responder" data-ty="derive" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Derive Macro <a href="index.html">rocket_codegen</a>::<wbr><a class="derive" href="#">Responder</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/rocket_codegen/lib.rs.html#852-854" title="goto source code">[src]</a></span></h1><pre class="rust derive"><code>#[derive(Responder)]
+{
+    // Attributes available to this derive:
+    #[response]
+}
+</code></pre><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Derive for the <a href="../rocket/response/trait.Responder.html"><code>Responder</code></a> trait.</p>
+<p>The <a href="../rocket/response/trait.Responder.html"><code>Responder</code></a> derive can be applied to enums and structs with named
+fields. When applied to enums, variants must have at least one field. When
+applied to structs, the struct must have at least one field.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">enum</span> <span class="ident">MyResponderA</span> {
+    <span class="ident">A</span>(<span class="ident">String</span>),
+    <span class="ident">B</span>(<span class="ident">File</span>, <span class="ident">ContentType</span>),
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">struct</span> <span class="ident">MyResponderB</span> {
+    <span class="ident">inner</span>: <span class="ident">OtherResponder</span>,
+    <span class="ident">header</span>: <span class="ident">ContentType</span>,
+}</code></pre></div>
+<h2 id="semantics" class="section-header"><a href="#semantics">Semantics</a></h2>
+<p>The derive generates an implementation of the <a href="../rocket/response/trait.Responder.html"><code>Responder</code></a> trait for the
+decorated enum or structure. The derive uses the <em>first</em> field of a variant
+or structure to generate a <a href="../rocket/struct.Response.html"><code>Response</code></a>. As such, the type of the first
+field must implement <a href="../rocket/response/trait.Responder.html"><code>Responder</code></a>. The remaining fields of a variant or
+structure are set as headers in the produced <a href="../rocket/struct.Response.html"><code>Response</code></a> using
+<a href="../rocket/response/struct.Response.html#method.set_header"><code>Response::set_header()</code></a>. As such, every other field (unless explicitly
+ignored, explained next) must implement <code>Into&lt;Header&gt;</code>.</p>
+<p>Except for the first field, fields decorated with <code>#[response(ignore)]</code> are
+ignored by the derive:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">enum</span> <span class="ident">MyResponder</span> {
+    <span class="ident">A</span>(<span class="ident">String</span>),
+    <span class="ident">B</span>(<span class="ident">File</span>, <span class="ident">ContentType</span>, <span class="attribute">#[<span class="ident">response</span>(<span class="ident">ignore</span>)]</span> <span class="ident">Other</span>),
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">struct</span> <span class="ident">MyOtherResponder</span> {
+    <span class="ident">inner</span>: <span class="ident">NamedFile</span>,
+    <span class="ident">header</span>: <span class="ident">ContentType</span>,
+    <span class="attribute">#[<span class="ident">response</span>(<span class="ident">ignore</span>)]</span>
+    <span class="ident">other</span>: <span class="ident">Other</span>,
+}</code></pre></div>
+<p>Decorating the first field with <code>#[response(ignore)]</code> has no effect.</p>
+<h2 id="field-attribute" class="section-header"><a href="#field-attribute">Field Attribute</a></h2>
+<p>Additionally, the <code>response</code> attribute can be used on named structures and
+enum variants to override the status and/or content-type of the <a href="../rocket/struct.Response.html"><code>Response</code></a>
+produced by the generated implementation. The <code>response</code> attribute used in
+these positions has the following grammar:</p>
+<div class="example-wrap"><pre class="language-text"><code>response := parameter (&#39;,&#39; parameter)?
+
+parameter := &#39;status&#39; &#39;=&#39; STATUS
+           | &#39;content_type&#39; &#39;=&#39; CONTENT_TYPE
+
+STATUS := unsigned integer &gt;= 100 and &lt; 600
+CONTENT_TYPE := string literal, as defined by Rust, identifying a valid
+                Content-Type, as defined by Rocket</code></pre></div>
+<p>It can be used as follows:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">500</span>, <span class="ident">content_type</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
+    <span class="ident">A</span>(<span class="ident">String</span>),
+    <span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">404</span>)]</span>
+    <span class="ident">B</span>(<span class="ident">NamedFile</span>, <span class="ident">ContentType</span>),
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">400</span>)]</span>
+<span class="kw">struct</span> <span class="ident">MyResponder</span> {
+    <span class="ident">inner</span>: <span class="ident">InnerResponder</span>,
+    <span class="ident">header</span>: <span class="ident">ContentType</span>,
+    <span class="attribute">#[<span class="ident">response</span>(<span class="ident">ignore</span>)]</span>
+    <span class="ident">other</span>: <span class="ident">Other</span>,
+}</code></pre></div>
+<p>The attribute accepts two key/value pairs: <code>status</code> and <code>content_type</code>. The
+value of <code>status</code> must be an unsigned integer representing a valid status
+code. The <a href="../rocket/struct.Response.html"><code>Response</code></a> produced from the generated implementation will have
+its status overridden to this value.</p>
+<p>The value of <code>content_type</code> must be a valid media-type in <code>top/sub</code> form or
+<code>shorthand</code> form. Examples include:</p>
+<ul>
+<li><code>&quot;text/html&quot;</code></li>
+<li><code>&quot;application/x-custom&quot;</code></li>
+<li><code>&quot;html&quot;</code></li>
+<li><code>&quot;json&quot;</code></li>
+<li><code>&quot;plain&quot;</code></li>
+<li><code>&quot;binary&quot;</code></li>
+</ul>
+<p>See <a href="../rocket/http/struct.ContentType.html#method.parse_flexible"><code>ContentType::parse_flexible()</code></a> for a full list of available
+shorthands. The <a href="../rocket/struct.Response.html"><code>Response</code></a> produced from the generated implementation will
+have its content-type overridden to this value.</p>
+<h2 id="generics" class="section-header"><a href="#generics">Generics</a></h2>
+<p>The derive accepts any number of type generics and at most one lifetime
+generic. If a type generic is present, the generated implementation will
+require a bound of <code>Responder&lt;'r, 'o&gt;</code> for each generic unless a
+<code>#[response(bound = ...)]</code> attribute as used:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rocket::serde::Serialize</span>;
+<span class="kw">use</span> <span class="ident">rocket::serde::json::Json</span>;
+<span class="kw">use</span> <span class="ident">rocket::http::ContentType</span>;
+<span class="kw">use</span> <span class="ident">rocket::response::Responder</span>;
+
+<span class="comment">// The bound `T: Responder` will be added to the generated implementation.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">404</span>, <span class="ident">content_type</span> <span class="op">=</span> <span class="string">&quot;html&quot;</span>)]</span>
+<span class="kw">struct</span> <span class="ident">NotFoundHtml</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+
+<span class="comment">// The bound `T: Serialize` will be added to the generated implementation.</span>
+<span class="comment">// This would fail to compile otherwise.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="attribute">#[<span class="ident">response</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;T: Serialize&quot;</span>, <span class="ident">status</span> <span class="op">=</span> <span class="number">404</span>)]</span>
+<span class="kw">struct</span> <span class="ident">NotFoundJson</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+
+<span class="comment">// The bounds `T: Serialize, E: Responder` will be added to the generated</span>
+<span class="comment">// implementation. This would fail to compile otherwise.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="attribute">#[<span class="ident">response</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;T: Serialize, E: Responder&lt;&#39;r, &#39;o&gt;&quot;</span>)]</span>
+<span class="kw">enum</span> <span class="ident">MyResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Ok</span>(<span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
+    <span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">404</span>)]</span>
+    <span class="prelude-val">Err</span>(<span class="ident">E</span>, <span class="ident">ContentType</span>)
+}</code></pre></div>
+<p>If a lifetime generic is present, it will be replace with <code>'o</code> in the
+generated implementation <code>impl Responder&lt;'r, 'o&gt;</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Generates `impl&lt;&#39;r, &#39;o&gt; Responder&lt;&#39;r, &#39;o&gt; for NotFoundHtmlString&lt;&#39;o&gt;`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="attribute">#[<span class="ident">response</span>(<span class="ident">status</span> <span class="op">=</span> <span class="number">404</span>, <span class="ident">content_type</span> <span class="op">=</span> <span class="string">&quot;html&quot;</span>)]</span>
+<span class="kw">struct</span> <span class="ident">NotFoundHtmlString</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);</code></pre></div>
+<p>Both type generics and lifetime generic may be used:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Responder</span>)]</span>
+<span class="kw">struct</span> <span class="ident">SomeResult</span><span class="op">&lt;</span><span class="lifetime">&#39;o</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;o</span> <span class="ident">str</span><span class="op">&gt;</span>);</code></pre></div>
+</div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rocket_codegen" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Semi-hierarchical configuration so con-free, it’s unreal."><meta name="keywords" content="rust, rustlang, rust-lang, figment"><title>figment - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../figment/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate figment</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.10.6</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all figment's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><div id="sidebar-vars" data-name="figment" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">figment</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/figment/lib.rs.html#1-494" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Semi-hierarchical configuration so con-free, it’s unreal.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers</span>::{<span class="ident">Format</span>, <span class="ident">Toml</span>, <span class="ident">Json</span>, <span class="ident">Env</span>}};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Package</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">authors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">publish</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="comment">// ... and so on ...</span>
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Config</span> {
+    <span class="ident">package</span>: <span class="ident">Package</span>,
+    <span class="ident">rustc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">rustdoc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="comment">// ... and so on ...</span>
+}
+
+<span class="kw">let</span> <span class="ident">config</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Figment::new</span>()
+    .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;Cargo.toml&quot;</span>))
+    .<span class="ident">merge</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;CARGO_&quot;</span>))
+    .<span class="ident">merge</span>(<span class="ident">Env::raw</span>().<span class="ident">only</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;RUSTC&quot;</span>, <span class="string">&quot;RUSTDOC&quot;</span>]))
+    .<span class="ident">join</span>(<span class="ident">Json::file</span>(<span class="string">&quot;Cargo.json&quot;</span>))
+    .<span class="ident">extract</span>()<span class="question-mark">?</span>;</code></pre></div>
+<h2 id="table-of-contents" class="section-header"><a href="#table-of-contents">Table of Contents</a></h2>
+<ul>
+<li><a href="#overview">Overview</a> - A brief overview of the entire crate.</li>
+<li><a href="#metadata">Metadata</a> - Figment’s value metadata tracking.</li>
+<li><a href="#extracting-and-profiles">Extracting and Profiles</a> - Semi-hierarchical
+“profiles”, profile selection, nesting, and extraction.</li>
+<li><a href="#crate-feature-flags">Crate Feature Flags</a> - Feature flags and what
+they enable.</li>
+<li><a href="#built-in-providers">Built-In Providers</a> - Table of providers provided
+by this crate.</li>
+<li><a href="#for-provider-authors">For <code>Provider</code> Authors</a> - Tips for writing
+<a href="trait.Provider.html" title="Provider"><code>Provider</code></a>s.</li>
+<li><a href="#for-library-authors">For Library Authors</a> - Brief guide for authors
+wishing to use Figment in their libraries or frameworks.</li>
+<li><a href="#for-application-authors">For Application Authors</a> - Brief guide for
+authors of applications that use libraries that use Figment.</li>
+<li><a href="#tips">Tips</a> - Things to remember when working with Figment.</li>
+<li><a href="#modules">Type Index</a> - The real rustdocs.</li>
+</ul>
+<h2 id="overview" class="section-header"><a href="#overview">Overview</a></h2>
+<p>Figment is a library for declaring and combining configuration sources and
+extracting typed values from the combined sources. There are two prevailing
+concepts:</p>
+<ul>
+<li><strong>Providers:</strong> Types implementing the <a href="trait.Provider.html" title="Provider"><code>Provider</code></a> trait, which
+implement a configuration source.</li>
+<li><strong>Figments:</strong> The <a href="struct.Figment.html" title="Figment"><code>Figment</code></a> type, which combines providers via
+<a href="struct.Figment.html#method.merge"><code>merge</code></a> or <a href="struct.Figment.html#method.join"><code>join</code></a> and allows
+typed <a href="struct.Figment.html#method.extract"><code>extraction</code></a>. Figments are also providers
+themselves.</li>
+</ul>
+<p>Defining a configuration consists of constructing a <code>Figment</code> and merging or
+joining any number of <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>s. Values for duplicate keys from a
+<em>merged</em> provider replace those from previous providers, while no
+replacement occurs for <em>joined</em> providers. Sources are read eagerly,
+immediately upon merging and joining.</p>
+<p>The simplest useful figment has one provider. The figment below will use all
+environment variables prefixed with <code>MY_APP_</code> as configuration values, after
+removing the prefix:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers::Env</span>};
+
+<span class="kw">let</span> <span class="ident">figment</span> <span class="op">=</span> <span class="ident">Figment::from</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;MY_APP_&quot;</span>));</code></pre></div>
+<p>Most figments will use more than one provider, merging and joining as
+necessary. The figment below reads <code>App.toml</code>, environment variables
+prefixed with <code>APP_</code> and fills any holes (but does replace existing values)
+with values from <code>App.json</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers</span>::{<span class="ident">Format</span>, <span class="ident">Toml</span>, <span class="ident">Json</span>, <span class="ident">Env</span>}};
+
+<span class="kw">let</span> <span class="ident">figment</span> <span class="op">=</span> <span class="ident">Figment::new</span>()
+    .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;App.toml&quot;</span>))
+    .<span class="ident">merge</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;APP_&quot;</span>))
+    .<span class="ident">join</span>(<span class="ident">Json::file</span>(<span class="string">&quot;App.json&quot;</span>));</code></pre></div>
+<p>Values can be <a href="struct.Figment.html#method.extract"><code>extracted</code></a> into any value that
+implements <a href="../serde/de/trait.Deserialize.html"><code>Deserialize</code></a>. The [<code>Jail</code>] type allows for
+semi-sandboxed configuration testing. The example below showcases
+extraction and testing:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers</span>::{<span class="ident">Format</span>, <span class="ident">Toml</span>, <span class="ident">Json</span>, <span class="ident">Env</span>}};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">AppConfig</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="ident">count</span>: <span class="ident">usize</span>,
+    <span class="ident">authors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="ident">figment::Jail::expect_with</span>(<span class="op">|</span><span class="ident">jail</span><span class="op">|</span> {
+    <span class="ident">jail</span>.<span class="ident">create_file</span>(<span class="string">&quot;App.toml&quot;</span>, <span class="string">r#&quot;
+        name = &quot;Just a TOML App!&quot;
+        count = 100
+    &quot;#</span>)<span class="question-mark">?</span>;
+
+    <span class="ident">jail</span>.<span class="ident">create_file</span>(<span class="string">&quot;App.json&quot;</span>, <span class="string">r#&quot;
+        {
+            &quot;name&quot;: &quot;Just a JSON App&quot;,
+            &quot;authors&quot;: [&quot;figment&quot;, &quot;developers&quot;]
+        }
+    &quot;#</span>)<span class="question-mark">?</span>;
+
+    <span class="ident">jail</span>.<span class="ident">set_env</span>(<span class="string">&quot;APP_COUNT&quot;</span>, <span class="number">250</span>);
+
+    <span class="comment">// Sources are read _eagerly_: sources are read as soon as they are</span>
+    <span class="comment">// merged/joined into a figment.</span>
+    <span class="kw">let</span> <span class="ident">figment</span> <span class="op">=</span> <span class="ident">Figment::new</span>()
+        .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;App.toml&quot;</span>))
+        .<span class="ident">merge</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;APP_&quot;</span>))
+        .<span class="ident">join</span>(<span class="ident">Json::file</span>(<span class="string">&quot;App.json&quot;</span>));
+
+    <span class="kw">let</span> <span class="ident">config</span>: <span class="ident">AppConfig</span> <span class="op">=</span> <span class="ident">figment</span>.<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config</span>, <span class="ident">AppConfig</span> {
+        <span class="ident">name</span>: <span class="string">&quot;Just a TOML App!&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">count</span>: <span class="number">250</span>,
+        <span class="ident">authors</span>: <span class="macro">vec!</span>[<span class="string">&quot;figment&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;developers&quot;</span>.<span class="ident">into</span>()],
+    });
+
+    <span class="prelude-val">Ok</span>(())
+});</code></pre></div>
+<h2 id="metadata" class="section-header"><a href="#metadata">Metadata</a></h2>
+<p>Figment takes <em>great</em> care to propagate as much information as possible
+about configuration sources. All values extracted from a figment are
+<a href="value/struct.Tag.html">tagged</a> with the originating <a href="struct.Metadata.html" title="Metadata"><code>Metadata</code></a> and
+<a href="struct.Profile.html" title="Profile"><code>Profile</code></a>. The tag is preserved across merges, joins, and errors, which
+also include the <a href="struct.Error.html#structfield.path"><code>path</code></a> of the offending key. Precise
+tracking allows for rich error messages as well as <a href="value/magic/index.html">“magic”</a> values like
+<a href="value/magic/struct.RelativePathBuf.html"><code>RelativePathBuf</code></a>, which automatically creates a path relative to the
+configuration file in which it was declared.</p>
+<p>A <a href="struct.Metadata.html" title="Metadata"><code>Metadata</code></a> consists of:</p>
+<ul>
+<li>The name of the configuration source.</li>
+<li>An <a href="struct.Metadata.html#method.interpolate">“interpolater”</a> that takes a path to a key
+and converts it into a provider-native key.</li>
+<li>A <a href="enum.Source.html" title="Source"><code>Source</code></a> specifying where the value was sourced from.</li>
+<li>A code source <a href="https://doc.rust-lang.org/1.57.0/core/panic/location/struct.Location.html"><code>Location</code></a> where the value’s provider was added to a
+<a href="struct.Figment.html" title="Figment"><code>Figment</code></a>.</li>
+</ul>
+<p>Along with the information in an <a href="struct.Error.html" title="Error"><code>Error</code></a>, this means figment can produce
+rich error values and messages:</p>
+<div class="example-wrap"><pre class="language-text"><code>error: invalid type: found string &quot;hi&quot;, expected u16
+ --&gt; key `debug.port` in TOML file App.toml</code></pre></div><h2 id="extracting-and-profiles" class="section-header"><a href="#extracting-and-profiles">Extracting and Profiles</a></h2>
+<p>Providers <em>always</em> <a href="trait.Provider.html#tymethod.data">produce</a> <a href="value/type.Dict.html"><code>Dict</code></a>s nested
+in <a href="struct.Profile.html" title="Profile"><code>Profile</code></a>s. A profile is <a href="struct.Figment.html#method.select"><code>selected</code></a> when
+extracting, and the dictionary corresponding to that profile is deserialized
+into the requested type. If no profile is selected, the
+<a href="struct.Profile.html#associatedconstant.Default"><code>Default</code></a> profile is used.</p>
+<p>There are two built-in profiles: the aforementioned default profile and the
+<a href="struct.Profile.html#associatedconstant.Global"><code>Global</code></a> profile. As the name implies, the default
+profile contains default values for all profiles. The global profile <em>also</em>
+contains values that correspond to all profiles, but those values supersede
+values of any other profile <em>except</em> the global profile, even when another
+source is merged.</p>
+<p>Some providers can be configured as <code>nested</code>, which allows top-level keys in
+dictionaries produced by the source to be treated as profiles. The following
+example showcases profiles and nesting:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers</span>::{<span class="ident">Format</span>, <span class="ident">Toml</span>, <span class="ident">Json</span>, <span class="ident">Env</span>}};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Config</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Config</span> {
+    <span class="comment">// Note the `nested` option on both `file` providers. This makes each</span>
+    <span class="comment">// top-level dictionary act as a profile.</span>
+    <span class="kw">fn</span> <span class="ident">figment</span>() -&gt; <span class="ident">Figment</span> {
+        <span class="ident">Figment::new</span>()
+            .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;Base.toml&quot;</span>).<span class="ident">nested</span>())
+            .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;App.toml&quot;</span>).<span class="ident">nested</span>())
+    }
+}
+
+<span class="ident">figment::Jail::expect_with</span>(<span class="op">|</span><span class="ident">jail</span><span class="op">|</span> {
+    <span class="ident">jail</span>.<span class="ident">create_file</span>(<span class="string">&quot;Base.toml&quot;</span>, <span class="string">r#&quot;
+        [default]
+        name = &quot;Base-Default&quot;
+
+        [debug]
+        name = &quot;Base-Debug&quot;
+    &quot;#</span>)<span class="question-mark">?</span>;
+
+    <span class="comment">// The default profile is used...by default.</span>
+    <span class="kw">let</span> <span class="ident">config</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;Base-Default&quot;</span>.<span class="ident">into</span>(), });
+
+    <span class="comment">// A different profile can be selected with `select`.</span>
+    <span class="kw">let</span> <span class="ident">config</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">select</span>(<span class="string">&quot;debug&quot;</span>).<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;Base-Debug&quot;</span>.<span class="ident">into</span>(), });
+
+    <span class="comment">// Selecting non-existent profiles is okay as long as we have defaults.</span>
+    <span class="kw">let</span> <span class="ident">config</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">select</span>(<span class="string">&quot;undefined&quot;</span>).<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;Base-Default&quot;</span>.<span class="ident">into</span>(), });
+
+    <span class="comment">// Replace the previous `Base.toml`. This one has a `global` profile.</span>
+    <span class="ident">jail</span>.<span class="ident">create_file</span>(<span class="string">&quot;Base.toml&quot;</span>, <span class="string">r#&quot;
+        [default]
+        name = &quot;Base-Default&quot;
+
+        [debug]
+        name = &quot;Base-Debug&quot;
+
+        [global]
+        name = &quot;Base-Global&quot;
+    &quot;#</span>)<span class="question-mark">?</span>;
+
+    <span class="comment">// Global values override all profile values.</span>
+    <span class="kw">let</span> <span class="ident">config_def</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">config_deb</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">select</span>(<span class="string">&quot;debug&quot;</span>).<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config_def</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;Base-Global&quot;</span>.<span class="ident">into</span>(), });
+    <span class="macro">assert_eq!</span>(<span class="ident">config_deb</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;Base-Global&quot;</span>.<span class="ident">into</span>(), });
+
+    <span class="comment">// Merges from succeeding providers take precedence, even for globals.</span>
+    <span class="ident">jail</span>.<span class="ident">create_file</span>(<span class="string">&quot;App.toml&quot;</span>, <span class="string">r#&quot;
+        [debug]
+        name = &quot;App-Debug&quot;
+
+        [global]
+        name = &quot;App-Global&quot;
+    &quot;#</span>)<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">config_def</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">config_deb</span>: <span class="ident">Config</span> <span class="op">=</span> <span class="ident">Config::figment</span>().<span class="ident">select</span>(<span class="string">&quot;debug&quot;</span>).<span class="ident">extract</span>()<span class="question-mark">?</span>;
+    <span class="macro">assert_eq!</span>(<span class="ident">config_def</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;App-Global&quot;</span>.<span class="ident">into</span>(), });
+    <span class="macro">assert_eq!</span>(<span class="ident">config_deb</span>, <span class="ident">Config</span> { <span class="ident">name</span>: <span class="string">&quot;App-Global&quot;</span>.<span class="ident">into</span>(), });
+
+    <span class="prelude-val">Ok</span>(())
+});</code></pre></div>
+<h2 id="crate-feature-flags" class="section-header"><a href="#crate-feature-flags">Crate Feature Flags</a></h2>
+<p>To help with compilation times, types, modules, and providers are gated by
+features. They are:</p>
+<div><table><thead><tr><th>feature</th><th>gated namespace</th><th>description</th></tr></thead><tbody>
+<tr><td><code>test</code></td><td>[<code>Jail</code>]</td><td>Semi-sandboxed environment for testing.</td></tr>
+<tr><td><code>env</code></td><td><a href="providers/struct.Env.html" title="providers::Env"><code>providers::Env</code></a></td><td>Environment variable <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>.</td></tr>
+<tr><td><code>toml</code></td><td><a href="providers/struct.Toml.html" title="providers::Toml"><code>providers::Toml</code></a></td><td>TOML file/string <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>.</td></tr>
+<tr><td><code>json</code></td><td>[<code>providers::Json</code>]</td><td>JSON file/string <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>.</td></tr>
+<tr><td><code>yaml</code></td><td>[<code>providers::Yaml</code>]</td><td>YAML file/string <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>.</td></tr>
+</tbody></table>
+</div><h2 id="built-in-providers" class="section-header"><a href="#built-in-providers">Built-In Providers</a></h2>
+<p>In addition to the four gated providers, figment provides the following
+providers out-of-the-box:</p>
+<div><table><thead><tr><th>provider</th><th>description</th></tr></thead><tbody>
+<tr><td><a href="providers/struct.Serialized.html" title="providers::Serialized"><code>providers::Serialized</code></a></td><td>Source from any <a href="../serde/ser/trait.Serialize.html"><code>Serialize</code></a> type.</td></tr>
+<tr><td><a href="trait.Provider.html#impl-Provider-for-(K%2C%20V)"><code>(impl AsRef&lt;str&gt;, impl Serialize)</code></a></td><td>Global source from a <code>(&quot;key&quot;, value)</code>.</td></tr>
+<tr><td><a href="trait.Provider.html#impl-Provider-for-%26%27_%20T"><code>&amp;T</code> <em>where</em> <code>T: Provider</code></a></td><td>Source from <code>T</code> as a reference.</td></tr>
+</tbody></table>
+</div><h2 id="for-provider-authors" class="section-header"><a href="#for-provider-authors">For Provider Authors</a></h2>
+<p>The <a href="trait.Provider.html" title="Provider"><code>Provider</code></a> trait documentation details extensively how to implement a
+provider for Figment. For data format based providers, the <a href="providers/trait.Format.html"><code>Format</code></a> trait
+allows for even simpler implementations.</p>
+<h2 id="for-library-authors" class="section-header"><a href="#for-library-authors">For Library Authors</a></h2>
+<p>For libraries and frameworks that wish to expose customizable configuration,
+we encourage the following structure:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
+
+<span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">Provider</span>, <span class="ident">Error</span>, <span class="ident">Metadata</span>, <span class="ident">Profile</span>};
+
+<span class="comment">// The library&#39;s required configuration.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Config</span> { <span class="comment">/* the library&#39;s required/expected values */</span> }
+
+<span class="comment">// The default configuration.</span>
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">Config</span> { <span class="comment">/* default values */</span> }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Config</span> {
+    <span class="comment">// Allow the configuration to be extracted from any `Provider`.</span>
+    <span class="kw">fn</span> <span class="ident">from</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Provider</span><span class="op">&gt;</span>(<span class="ident">provider</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="ident">Figment::from</span>(<span class="ident">provider</span>).<span class="ident">extract</span>()
+    }
+
+    <span class="comment">// Provide a default provider, a `Figment`.</span>
+    <span class="kw">fn</span> <span class="ident">figment</span>() -&gt; <span class="ident">Figment</span> {
+        <span class="kw">use</span> <span class="ident">figment::providers::Env</span>;
+
+        <span class="comment">// In reality, whatever the library desires.</span>
+        <span class="ident">Figment::from</span>(<span class="ident">Config::default</span>()).<span class="ident">merge</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;APP_&quot;</span>))
+    }
+}
+
+<span class="kw">use</span> <span class="ident">figment::value</span>::{<span class="ident">Map</span>, <span class="ident">Dict</span>};
+
+<span class="comment">// Make `Config` a provider itself for composability.</span>
+<span class="kw">impl</span> <span class="ident">Provider</span> <span class="kw">for</span> <span class="ident">Config</span> {
+    <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Metadata</span> {
+        <span class="ident">Metadata::named</span>(<span class="string">&quot;Library Config&quot;</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Profile</span>, <span class="ident">Dict</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>  {
+        <span class="ident">figment::providers::Serialized::defaults</span>(<span class="ident">Config::default</span>()).<span class="ident">data</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">profile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Profile</span><span class="op">&gt;</span> {
+        <span class="comment">// Optionally, a profile that&#39;s selected by default.</span>
+    }
+}</code></pre></div>
+<p>This structure has the following properties:</p>
+<ul>
+<li>The library provides a <code>Config</code> structure that clearly indicates which
+values the library requires.</li>
+<li>Users can completely customize configuration via their own <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>.</li>
+<li>The library’s <code>Config</code> is itself a <a href="trait.Provider.html" title="Provider"><code>Provider</code></a> for composability.</li>
+<li>The library provides a <code>Figment</code> which it will use as the default
+configuration provider.</li>
+</ul>
+<p><code>Config::from(Config::figment())</code> can be used as the library default while
+allowing complete customization of the configuration sources. Developers
+building on the library can base their figments on <code>Config::default()</code>,
+<code>Config::figment()</code>, both or neither.</p>
+<p>For frameworks, a top-level structure should expose the <code>Figment</code> that was
+used to extract the <code>Config</code>, allowing other libraries making use of the
+framework to also extract values from the same <code>Figment</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">Provider</span>, <span class="ident">Error</span>};
+
+<span class="kw">struct</span> <span class="ident">App</span> {
+    <span class="doccomment">/// The configuration.</span>
+    <span class="kw">pub</span> <span class="ident">config</span>: <span class="ident">Config</span>,
+    <span class="doccomment">/// The figment used to extract the configuration.</span>
+    <span class="kw">pub</span> <span class="ident">figment</span>: <span class="ident">Figment</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">App</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">App</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="ident">App::custom</span>(<span class="ident">Config::figment</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Provider</span><span class="op">&gt;</span>(<span class="ident">provider</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">App</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">figment</span> <span class="op">=</span> <span class="ident">Figment::from</span>(<span class="ident">provider</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">App</span> { <span class="ident">config</span>: <span class="ident">Config::from</span>(<span class="kw-2">&amp;</span><span class="ident">figment</span>)<span class="question-mark">?</span>, <span class="ident">figment</span> })
+    }
+}</code></pre></div>
+<h2 id="for-application-authors" class="section-header"><a href="#for-application-authors">For Application Authors</a></h2>
+<p>As an application author, you’ll need to make at least the following
+decisions:</p>
+<ol>
+<li>The sources you’ll accept configuration from.</li>
+<li>The precedence you’ll apply to each source.</li>
+<li>Whether you’ll use profiles or not.</li>
+</ol>
+<p>For special sources, you may find yourself needing to implement a custom
+<a href="trait.Provider.html" title="Provider"><code>Provider</code></a>. As with libraries, you’ll likely want to provide default
+values where possible either by providing it to the figment or by using
+<a href="https://serde.rs/attr-default.html">serde’s defaults</a>. Then, it’s simply a
+matter of declaring a figment and extracting the configuration from it.</p>
+<p>A reasonable starting point might be:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
+<span class="kw">use</span> <span class="ident">figment</span>::{<span class="ident">Figment</span>, <span class="ident">providers</span>::{<span class="ident">Env</span>, <span class="ident">Format</span>, <span class="ident">Toml</span>, <span class="ident">Serialized</span>}};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Config</span> {
+    <span class="ident">key</span>: <span class="ident">String</span>,
+    <span class="ident">another</span>: <span class="ident">u32</span>
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Config</span> {
+        <span class="ident">Config</span> {
+            <span class="ident">key</span>: <span class="string">&quot;default&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">another</span>: <span class="number">100</span>,
+        }
+    }
+}
+
+<span class="ident">Figment::from</span>(<span class="ident">Serialized::defaults</span>(<span class="ident">Config::default</span>()))
+    .<span class="ident">merge</span>(<span class="ident">Toml::file</span>(<span class="string">&quot;App.toml&quot;</span>))
+    .<span class="ident">merge</span>(<span class="ident">Env::prefixed</span>(<span class="string">&quot;APP_&quot;</span>));</code></pre></div>
+<h2 id="tips" class="section-header"><a href="#tips">Tips</a></h2>
+<p>Some things to remember when working with Figment:</p>
+<ul>
+<li>Merging and joining are <em>eager</em>: sources are read immediately. It’s
+useful to define a function that returns a <code>Figment</code>.</li>
+<li>The <a href="util/index.html" title="util"><code>util</code></a> modules contains helpful serialize and deserialize
+implementations for defining <code>Config</code> structures.</li>
+<li>The <a href="providers/trait.Format.html"><code>Format</code></a> trait makes implementing data-format based <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>s
+straight-forward.</li>
+<li><a href="value/magic/index.html"><code>Magic</code></a> values can significantly reduce the need to
+inspect a <code>Figment</code> directly.</li>
+<li>[<code>Jail</code>] makes testing configurations straight-forward and much less
+error-prone.</li>
+<li><a href="struct.Error.html" title="Error"><code>Error</code></a> may contain more than one error: iterate over it to retrieve
+all errors.</li>
+</ul>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="figment::error mod">error</a></div><div class="item-right docblock-short"><p>Error values produces when extracting configurations.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="providers/index.html" title="figment::providers mod">providers</a></div><div class="item-right docblock-short"><p>Built-in <a href="trait.Provider.html"><code>Provider</code></a> implementations for common sources.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="util/index.html" title="figment::util mod">util</a></div><div class="item-right docblock-short"><p>Useful functions and macros for writing figments.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="value/index.html" title="figment::value mod">value</a></div><div class="item-right docblock-short"><p><a href="value/enum.Value.html" title="Value"><code>Value</code></a> and friends: types representing valid configuration values.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="figment::Error struct">Error</a></div><div class="item-right docblock-short"><p>An error that occured while producing data or extracting a configuration.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Figment.html" title="figment::Figment struct">Figment</a></div><div class="item-right docblock-short"><p>Combiner of <a href="trait.Provider.html" title="Provider"><code>Provider</code></a>s for configuration value extraction.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Metadata.html" title="figment::Metadata struct">Metadata</a></div><div class="item-right docblock-short"><p>Metadata about a configuration value: its source’s name and location.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Profile.html" title="figment::Profile struct">Profile</a></div><div class="item-right docblock-short"><p>A configuration profile: effectively a case-insensitive string.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Source.html" title="figment::Source enum">Source</a></div><div class="item-right docblock-short"><p>The source for a configuration value.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Provider.html" title="figment::Provider trait">Provider</a></div><div class="item-right docblock-short"><p>Trait implemented by configuration source providers.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="figment" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>
