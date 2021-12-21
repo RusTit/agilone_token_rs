@@ -1,1 +1,1 @@
-web: ./target/release/tableau_rs_connector
+web: ./target/release/agilone_token_rs
