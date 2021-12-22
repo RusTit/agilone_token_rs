@@ -13,7 +13,7 @@ pub async fn greeting() -> String {
         return format!("Parsing error: {}", e);
     }
     let data = data.unwrap();
-    return format!("{:#?}", data)
+    return format!("{:#?}", data);
 }
 
 #[get("/<name>/<age>")]
