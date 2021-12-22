@@ -1,7 +1,14 @@
+use std::collections::HashMap;
 use rocket::get;
 
 #[get("/")]
-pub fn greeting() -> String {
+pub async fn greeting() -> String {
+    let resp = reqwest::get("https://httpbin.org/ip").await;
+    if let Ok(res) = resp {
+        // let data = res.json()::<HashMap<String, String>>().await;
+        let data: HashMap<String, String> = res.json().await.unwrap();
+        return format!("{:#?}", data)
+    }
     "Hi".into()
 }
 
