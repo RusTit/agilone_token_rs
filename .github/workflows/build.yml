@@ -29,8 +29,8 @@ jobs:
       run: cargo build --release
     - uses: actions/upload-artifact@v2
       with:
-          name: sandbox_first-${{ matrix.os }}
+          name: agilone_token_rs-${{ matrix.os }}
           # name: acoustic_ftp_rust-${{ matrix.os }}-${{ matrix.architecture }}
           path: |
-            target/release/sandbox_first
-            target/release/sandbox_first.exe
+            target/release/agilone_token_rs
+            target/release/agilone_token_rs.exe
