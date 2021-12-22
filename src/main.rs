@@ -7,7 +7,9 @@ use std::env;
 fn rocket() -> _ {
     let port = env::var("PORT").unwrap_or("3000".into());
     let port = port.parse::<u32>().unwrap();
-    let figment = rocket::Config::figment().merge(("port", port));
+    let figment = rocket::Config::figment()
+        .merge(("port", port))
+        .merge(("address", "0.0.0.0"));
     rocket::custom(figment)
         .mount("/hello", routes![hello])
         .mount("/", routes![greeting])
