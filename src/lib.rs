@@ -1,15 +1,19 @@
-use std::collections::HashMap;
 use rocket::get;
+use std::collections::HashMap;
 
 #[get("/")]
 pub async fn greeting() -> String {
     let resp = reqwest::get("https://httpbin.org/ip").await;
-    if let Ok(res) = resp {
-        // let data = res.json()::<HashMap<String, String>>().await;
-        let data: HashMap<String, String> = res.json().await.unwrap();
-        return format!("{:#?}", data)
+    if let Err(e) = resp {
+        return format!("API request failed: {}", e);
     }
-    "Hi".into()
+    let res = resp.unwrap();
+    let data = res.json::<HashMap<String, String>>().await;
+    if let Err(e) = data {
+        return format!("Parsing error: {}", e);
+    }
+    let data = data.unwrap();
+    return format!("{:#?}", data)
 }
 
 #[get("/<name>/<age>")]
