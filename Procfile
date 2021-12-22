@@ -1,1 +1,1 @@
-web: ./target/release/agilone_token_rs
+web: ROCKET_PORT=$PORT ROCKET_ADDRESS=0.0.0.0 ROCKET_ENV=prod ./target/release/agilone_token_rs
