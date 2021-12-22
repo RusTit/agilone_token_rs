@@ -1,5 +1,5 @@
 var searchIndex = JSON.parse('{\
-"agilone_token_rs":{"doc":"","t":[5],"n":["hello"],"q":["agilone_token_rs"],"d":[""],"i":[0],"f":[[[["str",15],["u8",15]],["string",3]]],"p":[]},\
+"agilone_token_rs":{"doc":"","t":[5,5],"n":["greeting","hello"],"q":["agilone_token_rs",""],"d":["",""],"i":[0,0],"f":[[[],["string",3]],[[["str",15],["u8",15]],["string",3]]],"p":[]},\
 "async_stream":{"doc":"Asynchronous stream of elements.","t":[14,14],"n":["stream","try_stream"],"q":["async_stream",""],"d":["Asynchronous stream","Asynchronous fallible stream"],"i":[0,0],"f":[null,null],"p":[]},\
 "async_stream_impl":{"doc":"","t":[],"n":[],"q":[],"d":[],"i":[],"f":[],"p":[]},\
 "async_trait":{"doc":"github crates-io docs-rs","t":[23],"n":["async_trait"],"q":["async_trait"],"d":[""],"i":[0],"f":[null],"p":[]},\

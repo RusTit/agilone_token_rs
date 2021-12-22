@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["hello",""]]});
+initSidebarItems({"fn":[["greeting",""],["hello",""]]});
